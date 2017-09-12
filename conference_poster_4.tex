@@ -85,7 +85,7 @@ linewidth=2pt % Width of the border lines around content boxes
 %	OBJECTIVES
 %----------------------------------------------------------------------------------------
 
-\headerbox{Bad Things Happen}{name=objectives,column=0,span=1, row=0}{
+\headerbox{Problem: Detecting Boundaries for Specific Objects}{name=objectives,column=0,span=1, row=0}{
 \begin{minipage}[t]{1\linewidth}
 \begin{center}
 \includegraphics[width=1\columnwidth]{figures/problem.png}
@@ -100,7 +100,7 @@ Imaging you would like to edit a photo after breaking up, or restore an old pict
 }
 
 
-\headerbox{The Algorithm}{name=algorithm,column=0,span=1, 
+\headerbox{The Pipeline}{name=algorithm,column=0,span=1, 
  below=objectives}{
  \vspace{0.6cm}
 \begin{minipage}[t]{1\linewidth}
@@ -135,7 +135,7 @@ Imaging you would like to edit a photo after breaking up, or restore an old pict
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 
-\headerbox{The Content Network}{name=content,column=1,span=1, row=0}{
+\headerbox{Segmentation Baseline}{name=content,column=1,span=1, row=0}{
 \begin{minipage}{1\linewidth}
 \begin{minipage}[t]{1\linewidth}
 \begin{center}
@@ -152,7 +152,7 @@ E_c(h(x,R), h(x_i,R))  = \parallel h(x,R) - h(x_i,R) \parallel_2^2
 \end{minipage}
 }
 
-\headerbox{The Texture Network}{name=texture,column=1,span=1, below=content}{
+\headerbox{Masked Boundary Baseline}{name=texture,column=1,span=1, below=content}{
 \begin{minipage}{1\linewidth}
 \begin{minipage}[t]{1\linewidth}
 \begin{center}
@@ -170,7 +170,7 @@ E_t(\phi_t(x),R)  = \\
 \end{minipage}
 }
 
-\headerbox{The Joint Loss Function}{name=loss,column=1,span=1,below=texture}{
+\headerbox{Local Class-Specific Boundary Detector}{name=loss,column=1,span=1,below=texture}{
 At each iteration, we minimize:\\
 \begin{minipage}{1\linewidth}
 \begin{eqnarray*}
@@ -181,7 +181,7 @@ At each iteration, we minimize:\\
 \end{minipage}
 }
 
-\headerbox{Multi-scale Optimization}{name=multiscale,column=1,span=1,bottomaligned = algorithm, below=loss}{
+\headerbox{Information Fusion}{name=multiscale,column=1,span=1,bottomaligned = algorithm, below=loss}{
 We optimize at three scales: 128, 256 and 512:
 \vspace{0.4cm}
 \begin{minipage}[t]{1\linewidth}
@@ -192,7 +192,7 @@ We optimize at three scales: 128, 256 and 512:
 \end{minipage}
 }
 
-\headerbox{\small Changing the Texture Weight $\alpha$}{name=weight,column=2,span=1, row=0}{ % This block's bottom aligns with the bottom of the conclusion block
+\headerbox{Numerical Results on VOC2012}{name=weight,column=2,span=1, row=0}{ % This block's bottom aligns with the bottom of the conclusion block
 The weight $\alpha$ measures the contribution of the texture constraint relative to the content constraint. It is a trade off between the sharpness of the texture and coherence of the structure: \\
 \begin{minipage}{1\linewidth}
 \begin{minipage}[t]{1\linewidth}
@@ -211,7 +211,7 @@ The weight $\alpha$ measures the contribution of the texture constraint relative
 \end{minipage}
 }
 
-\headerbox{\small Dropping the Content Constraint}{name=drop_content,column=2,span=1, below=weight }{ % This block's bottom aligns with the bottom of the conclusion block
+\headerbox{Visual Results on VOC2012}{name=drop_content,column=2,span=1, below=weight }{ % This block's bottom aligns with the bottom of the conclusion block
 Without using the content term to guide the optimization, the structure of the inpainting results is completely incorrect, although they are visually sharp:\\
 \begin{minipage}{1\linewidth}
 \begin{minipage}[t]{1\linewidth}
@@ -229,7 +229,7 @@ Input & Output without CN & Output with CN  \\
 \end{minipage}
 }
 
-\headerbox{\small Dropping the Adversarial Loss}{name=drop_adversarial,column=2,span=1, below=drop_content}{ 
+\headerbox{Results on Microsoft COCO}{name=drop_adversarial,column=2,span=1, below=drop_content}{ 
 When the initial prediction is blurry (using $\ell_2$ loss only), the final result becomes blurrier as well comparing with using the content network trained with both $\ell_2$ and adversarial loss.
 \begin{minipage}{1\linewidth}
 \centering
@@ -246,7 +246,7 @@ When the initial prediction is blurry (using $\ell_2$ loss only), the final resu
 %\end{minipage}
 \end{minipage}
 }
-\headerbox{\small Overall Comparison with Other Methods}{name=comparison,column=2,span=1, below=drop_adversarial}{
+\headerbox{Class-Agnostic Results}{name=comparison,column=2,span=1, below=drop_adversarial}{
 \begin{minipage}{1\linewidth}
 \begin{center}
  \includegraphics[width=0.85\linewidth]{figures/low_res/low_res2_3_3.png}
@@ -255,7 +255,7 @@ When the initial prediction is blurry (using $\ell_2$ loss only), the final resu
 \vspace{-0.2cm}
 }
 
-\headerbox{\small We Love Cats and Dogs}{name=imagenet,column=3,span=1, row=0}{ 
+\headerbox{Relationship Between Boundary Detection and Semantic Segmentation}{name=imagenet,column=3,span=1, row=0}{ 
 And we have collected so many dogs and cats for you:\\
 \begin{minipage}{1\linewidth}
 \setlength\tabcolsep{1.5pt}
@@ -283,7 +283,7 @@ And we have collected so many dogs and cats for you:\\
 \end{minipage}
 }
 
-\headerbox{\small And What Inpaints Paris Like Paris?}{name=paris,column=3,span=1, below=imagenet}{ 
+\headerbox{\small Effect of Dilation/Erosion Radius}{name=paris,column=3,span=1, below=imagenet}{ 
 \begin{minipage}{1\linewidth}
 \setlength\tabcolsep{1.5pt}
 \centering

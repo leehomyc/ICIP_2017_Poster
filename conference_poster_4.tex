@@ -21,7 +21,7 @@
 \documentclass[landscape,a0paper,fontscale=0.285]{baposter} % Adjust the font scale/size here
 
 \usepackage{graphicx} % Required for including images
-\graphicspath{{figures/}} % Directory in which figures are stored
+\graphicspath{{figs/}} % Directory in which figures are stored
 
 \usepackage{amsmath} % For typesetting math
 \usepackage{amssymb} % Adds new symbols to be used in math mode
@@ -77,249 +77,210 @@ linewidth=2pt % Width of the border lines around content boxes
 %	TITLE SECTION 
 %----------------------------------------------------------------------------------------
 %
-{\includegraphics[height=5em]{usc_logo.png}} % First university/lab logo on the left
-{\bf\textsc{\huge Semantic boundary refinement by Joint Inference from edges and regions}\vspace{.1em}} % Poster title
-{\textsc{Chao ``Harry'' Yang \hspace{12pt} \parbox{0.3\textwidth}{\small University of Southern California}}} % Author names and institution
+{\includegraphics[height=5em]{figs/usc_logo.png}} % First university/lab logo on the left
+{\bf\textsc{\LARGE Semantic boundary refinement by Joint Inference from edges and regions}\vspace{.1em}} % Poster title
+{\textsc{Chao ``Harry'' Yang \hspace{12pt} \parbox{0.27\textwidth}{\small University of Southern California}}} % Author names and institution
 
 %----------------------------------------------------------------------------------------
 %	OBJECTIVES
 %----------------------------------------------------------------------------------------
 
-\headerbox{Problem: Detecting Boundaries for Specific Objects}{name=objectives,column=0,span=1, row=0}{
+\headerbox{\small Detecting Boundaries for Specific Objects}{name=objectives,column=0,span=1, row=0}{
 \begin{minipage}[t]{1\linewidth}
-\begin{center}
-\includegraphics[width=1\columnwidth]{figures/problem.png}
-\end{center}
+\begin{tabular}{cc|cc}
+\includegraphics[width=0.2\textwidth]{figs/intro/2008_001805.jpg} & 
+\includegraphics[width=0.2\textwidth]{figs/intro/2008_001805_2.png} & 
+\includegraphics[width=0.2\textwidth]{figs/intro/2008_007915.jpg} & 
+\includegraphics[width=0.2\textwidth]{figs/intro/2008_007915_2.png} \\
+\end{tabular}
 \end{minipage}
-Imaging you would like to edit a photo after breaking up, or restore an old picture from damages, we designed a MULTI-SCALE DEEP LEARNING algorithm to help you! Our approach
-\begin{itemize}
-\item proposed a joint optimization framework that can hallucinates missing image regions by modeling a global content constraint and local texture constraint with convolutional neural networks.
-\item further introduced a multi-scale neural patch synthesis algorithm for high-resolution image inpainting based on the joint optimization framework.
-\end{itemize}
-\vspace{0.3em} % When there are two boxes, some whitespace may need to be added if the one on the right has more content
+We study the problem of detecting boundaries for specific classes of objects. Our approach leverages recent advances in semantic segmentation and bottom-up boundary detection. We propose a mechanism for combining multiple sources of information: predicted segmentation masks, bottom-up contours, and a novel local class-specific boundary detector. These are jointly mapped to final category-specific boundary strength estimate by a trained classifier. In experiments on VOC2010 and Microsoft COCO data sets, our method dramatically outperforms recent prior work, for some classes doubling the accuracy of boundary prediction.
 }
 
 
 \headerbox{The Pipeline}{name=algorithm,column=0,span=1, 
  below=objectives}{
- \vspace{0.6cm}
+ \vspace{0.7cm}
+ Our system of category-specific boundary detection consists of the following components: 
+ \begin{itemize}
+ \item Semantic segmentation (DeepLab).
+ \item Contour detector (UCM).
+ \item Local boundary detector (ConvNets)
+ \end{itemize}
+A fusion component is used at the end to combine the outputs of the three components. The pipeline is illustrated in the following graph:
 \begin{minipage}[t]{1\linewidth}
-\begin{center}
-\begin{tabular}{rl}
-\hline\noalign{\smallskip}
-\multicolumn{2}{l}{\textbf{High-Resolution Hole Filling}}\\
-\multicolumn{2}{l}{\textbf{with Multi-Scale Neural Patch Synthesis}}\\
-\hline\noalign{\smallskip}
-\multicolumn{2}{l}{\textbf{Input:} Image $x$, }\\ 
-& the content network $f$, \\
-& the texture network $t$,\\
-& the number of scales $N$ \\
-1: & Downsize $x$ to $128\times 128$. \\
-2: & Compute the initial content reference $x^1$. \\ 
-   & by giving $x$ as input to $f$.\\
-3: & \textbf{for} $s \in [1, 2, \dots , N]$: \\
-4. & Initialize $\tilde{x}=x^s$. \\
-4: & Update $\tilde{x}$ that minimizes the joint loss:\\
-   & $L=L_{content}+L_{texture}+L_{tv-smoothness}$. \\
-5: & Compute $x^{s+1} $ by up-sampling $\tilde{x}$.\\  
-7: & \textbf{end for}\\
-8: & Return $\tilde{x}^N$.\\
-\hline
-\end{tabular}
-\end{center}
+\includegraphics[width=1\textwidth]{figs/pipeline.png}
 \end{minipage}
-\vspace{0.6cm}
+Our experiments use two datasets: VOC 2012 and COCO.
+\vspace{0.7cm}
 }
 
 %----------------------------------------------------------------------------------------
 %	INTRODUCTION
 %----------------------------------------------------------------------------------------
 
-\headerbox{Segmentation Baseline}{name=content,column=1,span=1, row=0}{
-\begin{minipage}{1\linewidth}
+\headerbox{\small Segmentation and Masked Boundary Baseline}{name=content,column=1,span=1, row=0}{
+Segmentation and masked boundary are the first two components of our system and are also used as the baseline.
+\begin{itemize}
+\item Segmentation: we use the semantic segmentation contour (DeepLab) as the boundary.
+\item Masked boundary: We intersect class agnostic boundary detection (UCM) with semantic segmentation mask (original segmentation dilated by 5 pixels).
+\end{itemize}
+The results are shown in the following figure:
 \begin{minipage}[t]{1\linewidth}
-\begin{center}
-\includegraphics[width=1\columnwidth]{figures/content_network.png}
-\end{center}
-\end{minipage}
-\begin{center}
-\noindent\textbf{Context Encoder Predicts the Low-Res Content}
-\end{center}
-The content constraint: 
-\begin{equation*}
-E_c(h(x,R), h(x_i,R))  = \parallel h(x,R) - h(x_i,R) \parallel_2^2
-\end{equation*}
+  \begin{tabular}{ccc}
+    \includegraphics[width=.27\linewidth]{figs/2008_001439_img}&
+    \includegraphics[width=.27\linewidth]{figs/2008_001439_seg}&
+    \includegraphics[width=.27\linewidth]{figs/2008_001439_ucm2}\\
+    \includegraphics[width=.27\linewidth]{figs/2008_000075_img}&
+    \includegraphics[width=.27\linewidth]{figs/2008_000075_seg}&
+    \includegraphics[width=.27\linewidth]{figs/2008_000075_ucm2}\\
+    \includegraphics[width=.27\linewidth]{figs/2008_000359_img}&
+    \includegraphics[width=.27\linewidth]{figs/2008_000359_seg}&
+    \includegraphics[width=.27\linewidth]{figs/2008_000359_ucm2}\\
+    \includegraphics[width=.27\linewidth]{figs/2009_004581_img}&
+    \includegraphics[width=.27\linewidth]{figs/2009_004581_seg}&
+    \includegraphics[width=.27\linewidth]{figs/2009_004581_ucm2}\\
+    input & seg & masked bdry \\
+  \end{tabular}
 \end{minipage}
 }
 
-\headerbox{Masked Boundary Baseline}{name=texture,column=1,span=1, below=content}{
-\begin{minipage}{1\linewidth}
+
+\headerbox{\small Local Class-Specific Boundary Detector}{name=loss,column=1,span=1,below=content}{
+We can further improve the results by training a class-specific boundary predictor from scratch. We implement it as a multi-layer convnet, trained to classify image patches as boundary or non-boundary for the class at hand:\\
 \begin{minipage}[t]{1\linewidth}
-\begin{center}
-\includegraphics[width=1\columnwidth]{figures/texture_network.png}
-\end{center}
-\end{minipage}
-\begin{center}
-\noindent\textbf{Pre-trained VGG Optimizes the High-Res Texture}
-\end{center}
-The texture constraint:
-\begin{multline}
-E_t(\phi_t(x),R)  = \\ 
-\frac{1}{|R^{\phi}|}\sum_{i\in R^{\phi}} \parallel h(\phi_t(x),P_i) - h(\phi_t(x),P_{nn(i)})  \parallel_2^2 \nonumber
-\end{multline}
-\end{minipage}
-}
-
-\headerbox{Local Class-Specific Boundary Detector}{name=loss,column=1,span=1,below=texture}{
-At each iteration, we minimize:\\
-\begin{minipage}{1\linewidth}
-\begin{eqnarray*}
-\tilde{x}_{i+1} = & \argmin_{x} E_c(h(x,R), h(x_i,R)) \nonumber \\ 
-& +\alpha E_t(\phi_t(x),R^{\phi})  + \beta \Upsilon(x)
-\label{eq:opt}
-\end{eqnarray*}
+  \begin{tabular}{|c|c|c|c|c|}
+\hline
+    &layer type& RF size & \#units&stride\\
+\hline
+1 & conv & 4 & 96&1\\
+2 & max-pool & 2 & &2\\
+3 & conv & 3 & 256& 1\\
+4 & max-pool & 2 & &2\\
+5 & conv & 4 & 64 &1\\
+7 & ip & & 256 & \\
+8 & ip & & 256 &\\
+9 & ip & & 2&\\
+\hline
+  \end{tabular}
 \end{minipage}
 }
 
-\headerbox{Information Fusion}{name=multiscale,column=1,span=1,bottomaligned = algorithm, below=loss}{
-We optimize at three scales: 128, 256 and 512:
-\vspace{0.4cm}
+\headerbox{Information Fusion}{name=fusion,column=2,span=1}{
+The three components described above each capture a different aspect of visual information. 
+\begin{itemize}
+\item Segmentation: may offer poor localization of the boundaries.
+\item Masked boundary: low precision.
+\item local detector: based on limited view of the image due to its local nature.
+\end{itemize}
+We use a non-linear classifier to combine them:
+\[\log \text{Pr}(m=1|\mathbf{x})\,\propto\,\mathbf{w}_3^T\sigma(\mathbf{w}_2^T
+\sigma(\mathbf{w}_1^T\mathbf{x}+\mathbf{b}_1)+\mathbf{b}_2)+b_3,
+\]
+It can be viewed as a three-layer feedforward network with fully connected layers and sigmoid activation functions!
+}
+
+\headerbox{\small Numerical Results on VOC2012}{name=weight,column=2,span=1, below=fusion}{ % This block's bottom aligns with the bottom of the conclusion block
+1. Per-class accuracy comparing with STOA:\\
+\footnotesize Inverse detectors: \textit{Semantic contours from inverse detectors.} \\ 
+Situational detectors: \textit{Situational object boundary detection.}\normalsize\\
 \begin{minipage}[t]{1\linewidth}
-\begin{center}
-\includegraphics[width=0.5\columnwidth]{figures/multiscale_1.png}\\
-\includegraphics[width=0.5\columnwidth]{figures/multiscale_2.png}
-\end{center}
+\includegraphics[width=.95\linewidth]{figs/barplot-voc}
 \end{minipage}
-}
-
-\headerbox{Numerical Results on VOC2012}{name=weight,column=2,span=1, row=0}{ % This block's bottom aligns with the bottom of the conclusion block
-The weight $\alpha$ measures the contribution of the texture constraint relative to the content constraint. It is a trade off between the sharpness of the texture and coherence of the structure: \\
-\begin{minipage}{1\linewidth}
+2. Mean average precision:\\
 \begin{minipage}[t]{1\linewidth}
-\setlength\tabcolsep{1.5pt}
-\centering
-\tiny
-\begin{tabular}{cccc}
-\includegraphics[width=.20\linewidth]{figures/pink_0046_r.png} &
-\includegraphics[width=.20\linewidth]{figures/res_3_100_1_r.png} &
-\includegraphics[width=.20\linewidth]{figures/res_3_100_2_r.png} &
-\includegraphics[width=.20\linewidth]{figures/res_3_100_3_r.png} \\
-(a) Input image & (b) $\alpha=1e-6$ & (c) $\alpha=1e-5$ & (d) $\alpha=4e-5$\\ 
-\end{tabular}
-%\caption{The effect of texture weight $\alpha$. }\label{alpha}
-\end{minipage}
-\end{minipage}
+  \begin{tabular}{|l|l|}
+\hline
+    Method & Mean precision\\\hline
+    Inverse detectors& 19.9\\
+    Situational detectors & 31.6\\
+    \hline
+    Segmentation only $S$& 45.8\\
+    Masked boundary $S*B$&46.0\\
+    Local patch classifier $P$ & 26.9\\
+\hline
+Fusion $(D_s,S*B,P)$ & 51.8\\
+\hline
+  \end{tabular}
+ \end{minipage}
+ We can see that our simple baseline already out-performs the inverse detectors and situational detectors by a large margin.
 }
 
-\headerbox{Visual Results on VOC2012}{name=drop_content,column=2,span=1, below=weight }{ % This block's bottom aligns with the bottom of the conclusion block
-Without using the content term to guide the optimization, the structure of the inpainting results is completely incorrect, although they are visually sharp:\\
-\begin{minipage}{1\linewidth}
+\headerbox{Visual Results on VOC2012}{name=drop_content,column=3,span=1}{ % This block's bottom aligns with the bottom of the 
 \begin{minipage}[t]{1\linewidth}
-\setlength\tabcolsep{1.5pt}
-\centering
-\tiny
 \begin{tabular}{cccc}
-\includegraphics[width=.30\textwidth]{figures/ablation/pink_0065.jpg}&
-\includegraphics[width=.30\textwidth]{figures/ablation/no_content.jpg} &
-\includegraphics[width=.30\textwidth]{figures/ablation/result.jpg} \\
-Input & Output without CN & Output with CN  \\ 
+  \includegraphics[width=.20\textwidth]{figs/2008_001439_img}&
+  \includegraphics[width=.20\textwidth]{figs/2008_001439_final} &
+\includegraphics[width=.20\textwidth]{figs/2009_000335_img}&
+  \includegraphics[width=.20\textwidth]{figs/2009_000335_final}\\
+\includegraphics[width=.20\textwidth]{figs/2008_000075_img}&
+  \includegraphics[width=.20\textwidth]{figs/2008_000075_final} &
+\includegraphics[width=.20\textwidth]{figs/2008_000359_img}&
+  \includegraphics[width=.20\textwidth]{figs/2008_000359_final}\\
+\includegraphics[width=.20\textwidth]{figs/2008_000271_img}&
+  \includegraphics[width=.20\textwidth]{figs/2008_000271_final}&
+\includegraphics[width=.20\textwidth]{figs/2009_004581_img}&
+  \includegraphics[width=.20\textwidth]{figs/2009_004581_final}\\
 \end{tabular}
-%\caption{The effect of texture weight $\alpha$. }\label{alpha}
-\end{minipage}
 \end{minipage}
 }
 
-\headerbox{Results on Microsoft COCO}{name=drop_adversarial,column=2,span=1, below=drop_content}{ 
-When the initial prediction is blurry (using $\ell_2$ loss only), the final result becomes blurrier as well comparing with using the content network trained with both $\ell_2$ and adversarial loss.
+\headerbox{\small Numerical Results on Microsoft COCO}{name=drop_adversarial,column=3,span=1, below=drop_content}{ 
+we used the first 5,000 images from the {\tt val} set as the test set for our experiments. 
 \begin{minipage}{1\linewidth}
-\centering
-%\begin{minipage}[t]{1\linewidth}
-\setlength\tabcolsep{1pt}
-\tiny
+  \begin{tabular}{|l|l|}
+\hline
+    Method & Mean precision\\\hline
+    Segmentation only $S$& 36.9\\
+    Masked boundary $S*B$&38.5\\
+    Local patch classifier $P$ & 22.4\\
+\hline
+Fusion $(D_s,S*B,P)$ & 45.0\\
+\hline
+  \end{tabular}
+\end{minipage}
+The relative standing reflects that in VOC results, but all the numbers are lower, reflecting the
+increased difficulty of COCO compared to VOC.
+}
+
+
+\headerbox{\small Visual Results on Microsoft COCO}{name=imagenet,column=3,span=1, below=drop_adversarial}{ 
+\begin{minipage}[t]{1\linewidth}
 \begin{tabular}{cccc}
-\includegraphics[width=.24\linewidth]{figures/fig2/fake_0049_l2_r.png} &
-\includegraphics[width=.24\linewidth]{figures/fig2/res_3_100_r.png} & 
-\includegraphics[width=.24\linewidth]{figures/fig2/fake_0023_adversarial_r.png} &
-\includegraphics[width=.24\linewidth]{figures/fig2/no_bdry_0023_r.png} \\
-(a) CN with $\ell_2$ loss & (b) (a)'s final output  & (c) CN with $\ell_2$ \& Adv loss & (d) (c)'s final output. \\ 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_002965.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/train/2008_002965_2.png} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_003263.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/train/2008_003263_2.png} \\ 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_000835.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/diningtable/2008_000835_2.png} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_001077.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/diningtable/2008_001077_2.png} \\ 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_000541.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/sofa/2008_000541_2.png} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/all_jpgs/2008_002509.jpg} & 
+\includegraphics[width=0.20\textwidth]{pascal_example/horse/2008_002509_2.png} \\ 
 \end{tabular}
-%\end{minipage}
 \end{minipage}
-}
-\headerbox{Class-Agnostic Results}{name=comparison,column=2,span=1, below=drop_adversarial}{
-\begin{minipage}{1\linewidth}
-\begin{center}
- \includegraphics[width=0.85\linewidth]{figures/low_res/low_res2_3_3.png}
-\end{center}
-\end{minipage}
-\vspace{-0.2cm}
+
 }
 
-\headerbox{Relationship Between Boundary Detection and Semantic Segmentation}{name=imagenet,column=3,span=1, row=0}{ 
-And we have collected so many dogs and cats for you:\\
+\headerbox{\small Class Agnostic Results}{name=paris,column=3,span=1, below=imagenet}{ 
+We can also max-pooling the predictions of our category-specific detectors for each pixel, forming a class-agnostic boundary detection map:\\
 \begin{minipage}{1\linewidth}
-\setlength\tabcolsep{1.5pt}
-\centering
-\tiny
 \begin{tabular}{cccc}
-\includegraphics[width=.24\linewidth]{figures/pink_0076.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0076.jpg} &
-\includegraphics[width=.24\linewidth]{figures/pink_0081.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0081.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/pink_0082.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0082.jpg} &
-\includegraphics[width=.24\linewidth]{figures/pink_0154.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0154.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/pink_0071.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0071.jpg} &
-\includegraphics[width=.24\linewidth]{figures/pink_0097.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0097.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/dog_hole.jpg} &
-\includegraphics[width=.24\linewidth]{figures/res_3_100.jpg} &
-\includegraphics[width=.24\linewidth]{figures/pink_0342.jpg} &
-\includegraphics[width=.24\linewidth]{figures/no_bdry_0342.jpg} \\ 
-\end{tabular}
-%\caption{The effect of texture weight $\alpha$. }\label{alpha}
+  \includegraphics[width=.20\textwidth]{agnostic/2010_000697.jpg}&
+  \includegraphics[width=.20\textwidth]{agnostic/2010_000697.png}&
+  \includegraphics[width=.20\textwidth]{agnostic/2010_003695.jpg}& 
+    \includegraphics[width=.20\textwidth]{agnostic/2010_003695.png}\\
+  \includegraphics[width=.20\textwidth]{agnostic/2010_004567.jpg}&
+  \includegraphics[width=.20\textwidth]{agnostic/2010_004567.png}&
+  \includegraphics[width=.20\textwidth]{agnostic/2010_004597.jpg}& 
+    \includegraphics[width=.20\textwidth]{agnostic/2010_004597.png}\\
+ \end{tabular}
+
 \end{minipage}
 }
 
-\headerbox{\small Effect of Dilation/Erosion Radius}{name=paris,column=3,span=1, below=imagenet}{ 
-\begin{minipage}{1\linewidth}
-\setlength\tabcolsep{1.5pt}
-\centering
-\tiny
-\begin{tabular}{cccc}
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0023.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0023.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0048.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0048.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0078.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0078.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0085.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0085.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0097.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0097.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0119.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0119.jpg} \\
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0165.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0165.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/pink_0183.jpg} &
-\includegraphics[width=.24\linewidth]{figures/paris/no_bdry_0183.jpg} \\
-
-\end{tabular}
-%\caption{The effect of texture weight $\alpha$. }\label{alpha}
-\end{minipage}
-}
-
-\headerbox{\small For Paper, Results, Code and More}{name=qr,column=3,span=1, below=paris}{
-\vspace{-0.1cm}
-\begin{minipage}{1\linewidth}
-\begin{center}
- \includegraphics[width=0.15\linewidth]{figures/qr_code.jpg}
-\end{center}
-\end{minipage}
-\vspace{-0cm}
-}
 %----------------------------------------------------------------------------------------
 
 

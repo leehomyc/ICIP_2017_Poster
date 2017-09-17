@@ -199,7 +199,7 @@
 
 % Default paperwidth and paperheight = a0paper
 \DeclareOptionX{paperwidth}[841mm]{\setlength{\baposter@finalpaperwidth}{#1}}
-\DeclareOptionX{paperheight}[1189mm]{\setlength{\baposter@finalpaperheight}{#1}}
+\DeclareOptionX{paperheight}[1389mm]{\setlength{\baposter@finalpaperheight}{#1}}
 \DeclareOptionX{archA}         {                           \baposter@setfinalpapersize{9in}{12in}}%
 \DeclareOptionX{archB}         {                           \baposter@setfinalpapersize{12in}{18in}}%
 \DeclareOptionX{archC}         {                           \baposter@setfinalpapersize{18in}{24in}}%
@@ -208,7 +208,7 @@
 \DeclareOptionX{archE1}        {                           \baposter@setfinalpapersize{30in}{42in}}%
 \DeclareOptionX{archE2}        {                           \baposter@setfinalpapersize{26in}{38in}}%
 \DeclareOptionX{archE3}        {                           \baposter@setfinalpapersize{27in}{39in}}%
-\DeclareOptionX{a0paper}       {\@geometryKnowsThisSizetrue\baposter@setfinalpapersize{841mm}{1189mm}}%g
+\DeclareOptionX{a0paper}       {\@geometryKnowsThisSizetrue\baposter@setfinalpapersize{841mm}{1389mm}}%g
 \DeclareOptionX{a1paper}       {\@geometryKnowsThisSizetrue\baposter@setfinalpapersize{594mm}{841mm}}%g
 \DeclareOptionX{a2paper}       {\@geometryKnowsThisSizetrue\baposter@setfinalpapersize{420mm}{594mm}}%g
 \DeclareOptionX{a3paper}       {\@geometryKnowsThisSizetrue\baposter@setfinalpapersize{297mm}{420mm}}%g
